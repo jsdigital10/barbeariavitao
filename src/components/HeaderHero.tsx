@@ -1,7 +1,7 @@
 import React from 'react';
 import { LOGO_URL, BARBERSHOP_TAGLINE, BARBERSHOP_SUBTITLE } from '../constants';
 import { Calendar3DIcon } from './ThreeDIcon';
-import { ArrowDown, Sparkles } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 interface HeaderHeroProps {
   onStartBooking: () => void;
@@ -18,12 +18,6 @@ export const HeaderHero: React.FC<HeaderHeroProps> = ({ onStartBooking }) => {
       <div className="absolute top-12 left-1/4 w-1.5 h-1.5 rounded-full bg-[#FFDF73] opacity-70 blur-[0.5px] animate-float pointer-events-none" />
       <div className="absolute top-20 right-1/4 w-2 h-2 rounded-full bg-[#D4AF37] opacity-60 blur-[0.5px] animate-float-delay pointer-events-none" />
 
-      {/* Top Badge */}
-      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#101010]/80 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wider uppercase mb-5 backdrop-blur-md shadow-md animate-fade-in">
-        <Sparkles className="w-3.5 h-3.5" />
-        <span>Agendamento Online Oficial</span>
-      </div>
-
       {/* Main Logo Container - BIG, Transparent, Fade + Light Zoom + Subtle Gold Glow */}
       <div className="relative group max-w-[280px] sm:max-w-sm md:max-w-md w-full my-2 transition-all duration-700 ease-out animate-logo-entrance">
         {/* Soft Radial Gold Halo strictly behind PNG */}
@@ -34,6 +28,7 @@ export const HeaderHero: React.FC<HeaderHeroProps> = ({ onStartBooking }) => {
           alt="Barbearia do Vitor"
           className="w-full h-auto object-contain drop-shadow-[0_10px_35px_rgba(212,175,55,0.25)] select-none hover:scale-[1.02] transition-transform duration-500"
           loading="eager"
+          fetchPriority="high"
           decoding="sync"
         />
       </div>

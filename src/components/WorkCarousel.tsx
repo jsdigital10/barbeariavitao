@@ -5,11 +5,23 @@ import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 export const WorkCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const autoPlayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const total = CAROUSEL_IMAGES.length;
+
+  // Immediate preloading of all gallery photos into browser cache
+  useEffect(() => {
+    CAROUSEL_IMAGES.forEach((src, idx) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        setLoadedImages((prev) => ({ ...prev, [idx]: true }));
+      };
+    });
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % total);
@@ -107,12 +119,22 @@ export const WorkCarousel: React.FC = () => {
                     : 'opacity-0 scale-90 z-0 pointer-events-none'
                 }`}
               >
+                {/* Instant skeleton placeholder while image loads */}
+                {!loadedImages[index] && (
+                  <div className="absolute inset-0 bg-[#121212] animate-pulse flex items-center justify-center z-10">
+                    <Sparkles className="w-6 h-6 text-[#D4AF37]/30" />
+                  </div>
+                )}
                 <img
                   src={src}
                   alt={`Trabalho Barbearia do Vitor ${index + 1}`}
-                  loading={index < 2 ? 'eager' : 'lazy'}
+                  loading="eager"
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
                   decoding="async"
-                  className="w-full h-full object-cover object-center select-none"
+                  onLoad={() => setLoadedImages((prev) => ({ ...prev, [index]: true }))}
+                  className={`w-full h-full object-cover object-center select-none transition-opacity duration-300 ${
+                    loadedImages[index] ? 'opacity-100' : 'opacity-80'
+                  }`}
                 />
                 {/* Cinematic Vignette Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/30 pointer-events-none" />

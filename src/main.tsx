@@ -2,6 +2,15 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import { LOGO_URL, CAROUSEL_IMAGES } from './constants';
+
+// Immediately prefetch all critical visuals (logo + carousel images) into browser cache
+if (typeof window !== 'undefined') {
+  [LOGO_URL, ...CAROUSEL_IMAGES].forEach((url) => {
+    const img = new Image();
+    img.src = url;
+  });
+}
 
 // Prevent unwanted pinch-zoom and double-tap auto-zoom on mobile devices
 if (typeof window !== 'undefined') {
