@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$');
+    }
+
+    match /publicAvailability/{slotKey} {
+      // Leitura pública em tempo real dos slots ocupados (sem expor dados pessoais)
+      allow get, list: if true;
+
+      // Criação de bloqueio atômico de slot
+      allow create: if isValidId(slotKey)
+        && request.resource.data.slotKey == slotKey
+        && request.resource.data.status == 'reserved'
+        && request.resource.data.date is string
+        && request.resource.data.time is string;
+
+      allow delete: if slotKey.matches('^2099-.*');
+      allow update: if false;
+    }
+
+    match /appointments/{appointmentId} {
+      // Proteção de PII: agendamentos com dados dos clientes não podem ser listados publicamente
+      allow get, list: if false;
+
+      // Criação atômica de agendamento se o documento não existir previamente
+      allow create: if isValidId(appointmentId)
+        && request.resource.data.appointmentId == appointmentId
+        && request.resource.data.slotKey == appointmentId
+        && request.resource.data.customerName is string
+        && request.resource.data.customerName.size() >= 2
+        && request.resource.data.customerName.size() <= 100
+        && request.resource.data.customerPhone is string
+        && request.resource.data.customerPhone.size() >= 8
+        && request.resource.data.customerPhone.size() <= 25
+        && request.resource.data.serviceId is string
+        && request.resource.data.serviceName is string
+        && request.resource.data.price is number
+        && request.resource.data.date is string
+        && request.resource.data.time is string
+        && request.resource.data.status == 'confirmed'
+        && !exists(/databases/$(database)/documents/appointments/$(appointmentId));
+
+      allow delete: if appointmentId.matches('^2099-.*');
+      allow update: if false;
+    }
+  }
+}

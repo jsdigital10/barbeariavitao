@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "PublicSlot": {
+      "title": "PublicSlot",
+      "description": "Disponibilidade pública dos horários de agendamento sem expor dados pessoais",
+      "type": "object",
+      "properties": {
+        "slotKey": {
+          "type": "string",
+          "description": "Chave única no formato AAAA-MM-DD_HH-mm"
+        },
+        "date": {
+          "type": "string",
+          "description": "Data no formato AAAA-MM-DD"
+        },
+        "time": {
+          "type": "string",
+          "description": "Horário no formato HH:mm"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["reserved"],
+          "description": "Status de ocupação do horário"
+        },
+        "reservedAt": {
+          "type": "string",
+          "description": "Timestamp de reserva no servidor"
+        }
+      },
+      "required": ["slotKey", "date", "time", "status"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Agendamento da barbearia com dados privados do cliente",
+      "type": "object",
+      "properties": {
+        "appointmentId": {
+          "type": "string",
+          "description": "ID determinístico do agendamento correspondente ao slotKey"
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Nome do cliente"
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Telefone e WhatsApp do cliente com código e DDD"
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Identificador do serviço escolhido"
+        },
+        "serviceName": {
+          "type": "string",
+          "description": "Nome do serviço"
+        },
+        "price": {
+          "type": "number",
+          "description": "Valor final do serviço em reais"
+        },
+        "date": {
+          "type": "string",
+          "description": "Data do agendamento AAAA-MM-DD"
+        },
+        "time": {
+          "type": "string",
+          "description": "Horário do agendamento HH:mm"
+        },
+        "slotKey": {
+          "type": "string",
+          "description": "Identificador único do horário AAAA-MM-DD_HH-mm"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["confirmed", "cancelled"],
+          "description": "Status do agendamento"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp do servidor"
+        }
+      },
+      "required": [
+        "appointmentId",
+        "customerName",
+        "customerPhone",
+        "serviceId",
+        "serviceName",
+        "price",
+        "date",
+        "time",
+        "slotKey",
+        "status"
+      ]
+    }
+  },
+  "firestore": {
+    "/publicAvailability/{slotKey}": {
+      "schema": "PublicSlot",
+      "description": "Slots ocupados públicos para consulta em tempo real sem PII"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Documentos privados de agendamento de clientes"
+    }
+  }
+}
